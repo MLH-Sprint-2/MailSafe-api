@@ -3,9 +3,10 @@ import requests
 from django.http import JsonResponse
 import json
 from django.http import HttpResponse
+import os
 # from rest_framework.response import Response
 
-
+PASSWORD = os.environ.get('PASSWORD')
 DOMAINS_PROVIDED = {"domains": ["hash.fyi", "hideaddress.net",
                                 "mailsire.com", "secret.fyi"]
                     }
@@ -15,7 +16,7 @@ FORWARD_EMAIL_ENDPOINT = "https://api.forwardemail.net/v1/domains/hideaddress.ne
 
 
 def request_get_util():
-    return requests.get(FORWARD_EMAIL_ENDPOINT, auth=("PASSWORD", ''))
+    return requests.get(FORWARD_EMAIL_ENDPOINT, auth=(PASSWORD, ''))
 
 
 def get_aliases(request):
