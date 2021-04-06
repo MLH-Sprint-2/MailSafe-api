@@ -3,8 +3,16 @@
 import os
 import sys
 
+import environ
+
 
 def main():
+    env = environ.Env(
+    DEBUG=(bool, False)
+    )
+    environ.Env.read_env()
+
+    print(f"The env loaded : {os.environ.get('USERNAME')}")
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
     try:
         from django.core.management import execute_from_command_line
