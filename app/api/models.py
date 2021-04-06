@@ -18,3 +18,4 @@ class Aliases(models.Model):
                 status: {self.status} \n\n"
 # Sample query of getting Alias from username in User Class
 # filter using queryset Aliases.objects.filter(user__username='apratim')
+# Serializer for model has been added
