@@ -4,16 +4,21 @@ from django.http import JsonResponse
 import json
 from django.http import HttpResponse
 import os
+from rest_framework import viewsets
+from .models import Aliases
+from .serializers import AliasesSerializers
 # from rest_framework.response import Response
+
+
+
 
 USERNAME = os.environ.get('USERNAME')
 DOMAINS_PROVIDED = {"domains": ["swiftmegaminds.tech","hash.fyi", "hideaddress.net",
                                 "mailsire.com", "secret.fyi"]
                     }
 
-# Send to environment variable
 
-
+# Utility function
 def request_get_util(domain=''):
     FORWARD_EMAIL_ENDPOINT = f"https://api.forwardemail.net/v1/domains/{domain}/aliases"
     return requests.get(FORWARD_EMAIL_ENDPOINT, auth=(USERNAME, ''))
@@ -54,3 +59,15 @@ def get_alias_filtered(request, DOMAIN):
         if x["domain"]["name"] == DOMAIN:
             data.append(x)
     return JsonResponse(data, safe=False)
+
+# This is a DRF class which will do POST, GET, FETCH, PATCH on our Alias Model all without adding anything
+# Pretty powerfull imo though kinda abstracts everything bit too much 
+# Keeping this for reference 
+# Note: should set permission to admin only later
+# ENDPOINT: api/v1/users -> will return all the aliases if GET is used
+class AliasesViewSet(viewsets.ModelViewSet):
+    serializer_class = AliasesSerializers
+    def get_queryset(self):
+        """Function only for Admin purposes"""
+        return Aliases.objects.all()
+

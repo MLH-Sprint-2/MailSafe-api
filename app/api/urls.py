@@ -1,8 +1,15 @@
 from django.urls import path, include
-from . views import get_aliases, get_domains, get_alias_filtered
+from . import views
+# Router for DRF viewSet
+from rest_framework.routers import DefaultRouter
+# Make a default router
+router = DefaultRouter()
+# Register the new router
+router.register(r'users',views.AliasesViewSet,basename='users')
 urlpatterns = [
-    path('alias', get_aliases, name="get_aliases"),
-    path('domains', get_domains, name="get_domains"),
+    path('alias', views.get_aliases, name="get_aliases"),
+    path('domains', views.get_domains, name="get_domains"),
     path('alias/<str:DOMAIN>',
-         get_alias_filtered, name="get_alias_filtered"),
+         views.get_alias_filtered, name="get_alias_filtered"),
+    path('',include(router.urls))
 ]
