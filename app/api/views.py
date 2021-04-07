@@ -18,9 +18,12 @@ DOMAINS_PROVIDED = {"domains": ["swiftmegaminds.tech", "hash.fyi", "hideaddress.
 
 
 # Utility function
-def request_get_util(domain=''):
+def request_get_util(domain='', payload=None):
     FORWARD_EMAIL_ENDPOINT = f"https://api.forwardemail.net/v1/domains/{domain}/aliases"
-    return requests.get(FORWARD_EMAIL_ENDPOINT, auth=(USERNAME, ''))
+    if not payload:
+        return requests.get(FORWARD_EMAIL_ENDPOINT, auth=(USERNAME, ''))
+    else:
+        return requests.post(FORWARD_EMAIL_ENDPOINT, auth=(USERNAME, ''), json=payload)
 
 
 def get_aliases(request):
@@ -59,7 +62,13 @@ def get_alias_filtered(request, DOMAIN):
             data.append(respose_dict)
         return HttpResponse(json.dumps(data))
     elif (request.method == 'POST'):
-        res = request_get_util(domain=DOMAIN)
+        data_received = json.loads(request.body)
+        blank = {
+            "name": data_received["name"],
+            "recipients": data_received["recipients"],
+            "is_enabled": data_received["is_enabled"]
+        }
+        res = request_get_util(domain=DOMAIN, payload=blank)
         return JsonResponse(res.json(), safe=False)
 
 
