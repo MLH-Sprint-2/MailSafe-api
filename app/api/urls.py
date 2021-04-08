@@ -11,7 +11,7 @@ urlpatterns = [
     path('domains', views.get_domains, name="get_domains"),
     path('alias/<str:DOMAIN>',
          views.get_alias_filtered, name="get_alias_filtered"),
-    path('alias/<str:DOMAIN>/<int:id>',
+    path('alias/<str:DOMAIN>/<str:ID>',
          views.delete_alias, name="delete_alias"),
     path('', include(router.urls))
 ]

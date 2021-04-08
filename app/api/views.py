@@ -68,6 +68,7 @@ def get_alias_filtered(request, DOMAIN):
             "recipients": data_received["recipients"],
             "is_enabled": data_received["is_enabled"]
         }
+        print(data_received)
         res = request_get_util(domain=DOMAIN, payload=blank)
         return JsonResponse(res.json(), safe=False)
 
@@ -83,6 +84,19 @@ def create_alias(request, DOMAIN):
 
     return JsonResponse(res.json())
     # If succesfull add the Alias to Database as well
+
+
+@csrf_exempt
+def delete_alias(request, DOMAIN, ID):
+    """
+    Delete Alias based on ID
+    ENDPOINT : /api/v1/alias/:domain/:id
+    """
+    FORWARD_EMAIL_ENDPOINT = f"https://api.forwardemail.net/v1/domains/{DOMAIN}/aliases/{ID}"
+    res = requests.delete(FORWARD_EMAIL_ENDPOINT, auth=(USERNAME, ''))
+    if res.status_code == 200:
+        print("Deleted")
+    return JsonResponse(res.json())
 
 
 # This is a DRF class which will do POST, GET, FETCH, PATCH on our Alias Model all without adding anything
