@@ -8,6 +8,7 @@ router = DefaultRouter()
 router.register(r'users', views.AliasesViewSet, basename='users')
 urlpatterns = [
     path('alias', views.get_aliases, name="get_aliases"),
+     path('alias/user/domain/', views.get_aliases_user, name="get_aliases_user"),
     path('domains', views.get_domains, name="get_domains"),
     path('alias/<str:DOMAIN>',
          views.get_alias_filtered, name="get_alias_filtered"),
