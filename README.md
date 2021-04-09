@@ -9,8 +9,9 @@ This is the Django RESTful API for MailSafe Application. The endpoints can be te
 
 NOTE ALL ENDPOINTS ARE RESTRICTED VIA Authenticated Header 
 
-Authorization : Token <a85efc83ccb629878a4d6d15e1fc1ffb51136da9>
+Authorization : Token <a85efc83ccb629878a4d6d15e1fc1ffb51136da9> --> Example
 All payload i s of raw json type
+  
 Access Admin panel via browser directly
 ```
 admin/
@@ -44,7 +45,21 @@ Delete
 ```
 v1/domains/:domain/aliases/:id
 ```
-
+Domains
+```
+def get_alias_filtered(request, DOMAIN):
+    """
+    Return Domain filtered by domain
+    API_ENDPOINT:api/v1/alias/<domains>
+    Json raw body 
+    ---------------
+    Auth will be header with key Authorization : Token a85efc83ccb629878a4d6d15e1fc1ffb51136da9
+    {
+    "name": "432",
+    "recipients": "random@email.com",
+    "is_enabled": true
+    }
+```
 
 
 
