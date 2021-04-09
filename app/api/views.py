@@ -126,3 +126,25 @@ class AliasesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Function only for Admin purposes"""
         return Aliases.objects.all()
+
+
+
+
+# ClassView for getting token and email togehter
+# ENDPOINT: http://0.0.0.0:8000/api/v1/auth/users/token/email/
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+
+
+class TokenObtainView(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        custom_response = {
+            'token': token.key,
+            'user_id': user.email
+        }
+        return JsonResponse(custom_response)
