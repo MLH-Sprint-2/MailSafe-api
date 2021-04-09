@@ -11,7 +11,6 @@ from .serializers import AliasesSerializers
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes, api_view
-
 USERNAME = os.environ.get('USERNAME')
 DOMAINS_PROVIDED = {"domains": ["swiftmegaminds.tech", "hash.fyi", "hideaddress.net",
                                 "mailsire.com", "secret.fyi"]
@@ -34,6 +33,34 @@ def get_aliases(request):
     """
     res = request_get_util()
     return JsonResponse(res.json(), safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_aliases_user(request):
+    """
+    Returns all the Aliases
+    API_ENDPOINT:api/v1/aliases
+    ----------
+    payload
+    {
+    "email":"a@a.com"
+    }
+    """
+    alias_array = []
+    payload = {}
+    print("came to get_aliases_user()")
+    data_received = json.loads(request.body)
+    email = data_received["email"]
+    print(f"Email body:{email}")
+    db_data = Aliases.objects.filter(user__email=email)
+    print(f"QuerySet->{db_data}")
+    for x in db_data:
+        alias_array.append(x.alias)
+    return JsonResponse({"alias":alias_array}, safe=False)
+
+
+
 
 
 @api_view(['GET'])
