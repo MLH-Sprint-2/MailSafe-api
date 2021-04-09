@@ -9,7 +9,8 @@ from .models import Aliases
 from .serializers import AliasesSerializers
 # from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes, api_view
 
 USERNAME = os.environ.get('USERNAME')
 DOMAINS_PROVIDED = {"domains": ["swiftmegaminds.tech", "hash.fyi", "hideaddress.net",
@@ -35,6 +36,8 @@ def get_aliases(request):
     return JsonResponse(res.json(), safe=False)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_domains(request):
     """
     REDUNDANT
@@ -45,10 +48,21 @@ def get_domains(request):
 
 
 @csrf_exempt
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def get_alias_filtered(request, DOMAIN):
     """
     Return Domain filtered by domain
     API_ENDPOINT:api/v1/alias/<domains>
+    Json raw body 
+    ---------------
+    Auth will be header with key Authorization : Token a85efc83ccb629878a4d6d15e1fc1ffb51136da9
+    {
+    "name": "432",
+    "recipients": "random@email.com",
+    "is_enabled": true
+    }
+    ---------------
     """
     if (request.method == 'GET'):
         res = request_get_util(domain=DOMAIN)
@@ -87,6 +101,8 @@ def create_alias(request, DOMAIN):
 
 
 @csrf_exempt
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def delete_alias(request, DOMAIN, ID):
     """
     Delete Alias based on ID
