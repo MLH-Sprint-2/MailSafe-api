@@ -9,7 +9,8 @@ from .models import Aliases
 from .serializers import AliasesSerializers
 # from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes, api_view
 
 USERNAME = os.environ.get('USERNAME')
 DOMAINS_PROVIDED = {"domains": ["swiftmegaminds.tech", "hash.fyi", "hideaddress.net",
@@ -18,9 +19,12 @@ DOMAINS_PROVIDED = {"domains": ["swiftmegaminds.tech", "hash.fyi", "hideaddress.
 
 
 # Utility function
-def request_get_util(domain=''):
+def request_get_util(domain='', payload=None):
     FORWARD_EMAIL_ENDPOINT = f"https://api.forwardemail.net/v1/domains/{domain}/aliases"
-    return requests.get(FORWARD_EMAIL_ENDPOINT, auth=(USERNAME, ''))
+    if not payload:
+        return requests.get(FORWARD_EMAIL_ENDPOINT, auth=(USERNAME, ''))
+    else:
+        return requests.post(FORWARD_EMAIL_ENDPOINT, auth=(USERNAME, ''), json=payload)
 
 
 def get_aliases(request):
@@ -32,6 +36,8 @@ def get_aliases(request):
     return JsonResponse(res.json(), safe=False)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_domains(request):
     """
     REDUNDANT
@@ -42,10 +48,21 @@ def get_domains(request):
 
 
 @csrf_exempt
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def get_alias_filtered(request, DOMAIN):
     """
     Return Domain filtered by domain
     API_ENDPOINT:api/v1/alias/<domains>
+    Json raw body 
+    ---------------
+    Auth will be header with key Authorization : Token a85efc83ccb629878a4d6d15e1fc1ffb51136da9
+    {
+    "name": "432",
+    "recipients": "random@email.com",
+    "is_enabled": true
+    }
+    ---------------
     """
     if (request.method == 'GET'):
         res = request_get_util(domain=DOMAIN)
@@ -59,7 +76,14 @@ def get_alias_filtered(request, DOMAIN):
             data.append(respose_dict)
         return HttpResponse(json.dumps(data))
     elif (request.method == 'POST'):
-        res = request_get_util(domain=DOMAIN)
+        data_received = json.loads(request.body)
+        blank = {
+            "name": data_received["name"],
+            "recipients": data_received["recipients"],
+            "is_enabled": data_received["is_enabled"]
+        }
+        print(data_received)
+        res = request_get_util(domain=DOMAIN, payload=blank)
         return JsonResponse(res.json(), safe=False)
 
 
@@ -74,6 +98,21 @@ def create_alias(request, DOMAIN):
 
     return JsonResponse(res.json())
     # If succesfull add the Alias to Database as well
+
+
+@csrf_exempt
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_alias(request, DOMAIN, ID):
+    """
+    Delete Alias based on ID
+    ENDPOINT : /api/v1/alias/:domain/:id
+    """
+    FORWARD_EMAIL_ENDPOINT = f"https://api.forwardemail.net/v1/domains/{DOMAIN}/aliases/{ID}"
+    res = requests.delete(FORWARD_EMAIL_ENDPOINT, auth=(USERNAME, ''))
+    if res.status_code == 200:
+        print("Deleted")
+    return JsonResponse(res.json())
 
 
 # This is a DRF class which will do POST, GET, FETCH, PATCH on our Alias Model all without adding anything

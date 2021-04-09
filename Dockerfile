@@ -5,6 +5,9 @@ ENV PYTHONUNBUFFERED 1
 # Dependencies from requirement.txt -> docker
 COPY ./requirements.txt /requirements.txt
 # run pip on it
+RUN pip install --upgrade pip
+
+RUN apk add gcc musl-dev python3-dev libffi-dev openssl-dev libffi-dev
 RUN pip install -r requirements.txt
 
 # -----------------------------------
